@@ -1,19 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Calculator } from './model/calculator';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'ng-testing-services';
-
-  ngOnInit(): void {
-    const calculator = new Calculator();
-    const result = calculator.multiply(2, 3);
-    console.log(result === 6);
-    const result2 = calculator.divide(2, 0);
-    console.log(result2 === null);
-  }
 }
