@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class ServiceWithoutInyections {
+export class SimpleService {
   private value = 'real value';
 
   constructor() {}

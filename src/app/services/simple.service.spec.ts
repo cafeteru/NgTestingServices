@@ -1,11 +1,11 @@
 import { firstValueFrom } from 'rxjs';
-import { ServiceWithoutInyections } from './service.without.inyections';
+import { SimpleService } from './simple.service';
 
 describe('ServiceWithoutInyections', () => {
-  let service: ServiceWithoutInyections;
+  let service: SimpleService;
 
   beforeEach(() => {
-    service = new ServiceWithoutInyections();
+    service = new SimpleService();
   });
 
   it('should be created', () => {
