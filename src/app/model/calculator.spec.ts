@@ -7,7 +7,7 @@ describe('Tests for Calculator', () => {
     calculator = new Calculator();
   });
 
-  fit('#multiply should return 0 if any of the parameters is 0', () => {
+  it('#multiply should return 0 if any of the parameters is 0', () => {
     const result = calculator.multiply(2, 0);
     expect(result).toBe(0);
   });
@@ -17,7 +17,7 @@ describe('Tests for Calculator', () => {
     expect(result).toEqual(4);
   });
 
-  fit('#divide should return null if the denominator is 0', () => {
+  it('#divide should return null if the denominator is 0', () => {
     const result = calculator.divide(2, 0);
     expect(result).toBeNull();
   });

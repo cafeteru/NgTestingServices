@@ -58,6 +58,31 @@ google-chrome --version
 
 - Jest (TODO)
 
+## Mocha Report instalation in Karma
+
+1. Install dependency
+
+```terminal
+npm i karma-mocha-reporter --save-dev
+```
+
+2. Config `karma.conf.js`
+
+```js
+module.exports = function (config) {
+  config.set({
+    ...
+    plugins: [
+      ...
+      require("karma-mocha-reporter"),
+    ],
+    ...
+    reporters: ["mocha"],
+  });
+};
+
+```
+
 ## Documentation
 
 [Matchers](https://jasmine.github.io/api/edge/matchers.html)
