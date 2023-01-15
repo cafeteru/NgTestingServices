@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     const calculator = new Calculator();
     const result = calculator.multiply(2, 3);
-    console.log(result);
+    console.log(result === 6);
     const result2 = calculator.divide(2, 0);
     console.log(result2 === null);
   }

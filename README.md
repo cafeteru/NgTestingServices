@@ -20,3 +20,7 @@ google-chrome --version
 - it: define a test. Receives as a parameter the name of the test and a function to be executed by the test.
 
 - expect: What to expect receiving that test. With expect the verification of the test is done.
+
+## Documentation
+
+[Matchers](https://jasmine.github.io/api/edge/matchers.html)
