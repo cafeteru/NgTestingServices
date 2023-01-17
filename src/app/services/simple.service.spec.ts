@@ -1,3 +1,4 @@
+import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { SimpleService } from './simple.service';
 
@@ -5,7 +6,10 @@ describe('ServiceWithoutInyections', () => {
   let service: SimpleService;
 
   beforeEach(() => {
-    service = new SimpleService();
+    TestBed.configureTestingModule({
+      providers: [SimpleService],
+    });
+    service = TestBed.inject(SimpleService);
   });
 
   it('should be created', () => {
