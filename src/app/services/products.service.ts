@@ -43,7 +43,7 @@ export class ProductsService {
                 map(products => products.map(item => {
                     return {
                         ...item,
-                        taxes: item.price > 0 ?.21 * item.price : 0
+                        taxes: item.price > 0 ? .21 * item.price : 0
                     }
                 }))
             );
@@ -61,13 +61,13 @@ export class ProductsService {
             .pipe(
                 catchError((error: HttpErrorResponse) => {
                     if (error.status === HttpStatusCode.Conflict) {
-                        return throwError('Algo esta fallando en el server');
+                        return throwError(() => 'Algo esta fallando en el server');
                     }
                     if (error.status === HttpStatusCode.NotFound) {
-                        return throwError('El producto no existe');
+                        return throwError(() => 'El producto no existe');
                     }
                     if (error.status === HttpStatusCode.Unauthorized) {
-                        return throwError('No estas permitido');
+                        return throwError(() => 'No estas permitido');
                     }
                     return throwError('Ups algo salio mal');
                 })

@@ -1,8 +1,8 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { generateOneProduct, generateManyProducts } from '../models/product.mock';
-import { Product } from '../models/product.model';
+import { generateManyProducts, generateOneProduct } from '../models/product.mock';
+import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product.model';
 import { ProductsService } from './products.service';
 
 describe('ProductsService', () => {
@@ -16,6 +16,10 @@ describe('ProductsService', () => {
     });
     service = TestBed.inject(ProductsService);
     httpTestingController = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify(); // Verifies that no requests are outstanding.
   });
 
   it('should be created', () => {
@@ -58,7 +62,6 @@ describe('ProductsService', () => {
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
       req.flush(mockProducts); // Returns the mock products.
-      httpTestingController.verify(); // Verifies that no requests are outstanding.
     });
 
     it('should return a product list', (doneFn) => {
@@ -74,7 +77,6 @@ describe('ProductsService', () => {
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url);
       req.flush(mockData);
-      httpTestingController.verify();
     });
   });
 
@@ -91,7 +93,6 @@ describe('ProductsService', () => {
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url);
       req.flush(mockData);
-      httpTestingController.verify();
     });
 
     it('should return a product list with taxes', (doneFn) => {
@@ -110,7 +111,6 @@ describe('ProductsService', () => {
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url);
       req.flush(mockData);
-      httpTestingController.verify();
     });
 
     it('should return a product list with taxes 0 when price is less 0', (doneFn) => {
@@ -131,7 +131,6 @@ describe('ProductsService', () => {
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url);
       req.flush(mockData);
-      httpTestingController.verify();
     });
 
     it('should send query params width limit 10 offset 3', (doneFn) => {
@@ -151,7 +150,67 @@ describe('ProductsService', () => {
       const params = req.request.params;
       expect(params.get('limit')).toEqual(`${limit}`);
       expect(params.get('offset')).toEqual(`${offset}`);
-      httpTestingController.verify();
+    });
+  });
+
+  describe('tests for create', () => {
+    it('should create a product', (doneFn) => {
+      const mockData: Product = generateOneProduct();
+      const dto: CreateProductDTO = {
+        ...mockData,
+        categoryId: 1,
+      };
+
+      service.create({ ...dto })
+        .subscribe((data) => {
+          expect(data).toEqual(mockData);
+          doneFn();
+        });
+
+      const url = `${service.apiUrl}/products`;
+      const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
+      req.flush(mockData); // Returns the mock products.
+      expect(req.request.method).toEqual('POST'); // Verifies that the request is a POST.
+      expect(req.request.body).toEqual(dto); // Verifies that the request body is the same as the dto.
+    });
+  });
+
+  describe('tests for update', () => {
+    it('should update a product', (doneFn) => {
+      const mockData: Product = generateOneProduct();
+      const dto: UpdateProductDTO = {
+        ...mockData,
+        categoryId: 1,
+      };
+
+      service.update(mockData.id, { ...dto })
+        .subscribe((data) => {
+          expect(data).toEqual(mockData);
+          doneFn();
+        });
+
+      const url = `${service.apiUrl}/products/${mockData.id}`;
+      const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
+      req.flush(mockData); // Returns the mock products.
+      expect(req.request.method).toEqual('PUT'); // Verifies that the request is a PUT.
+      expect(req.request.body).toEqual(dto); // Verifies that the request body is the same as the dto.
+    });
+  });
+
+  describe('tests for delete', () => {
+    it('should delete a product', (doneFn) => {
+      const mockData: Product = generateOneProduct();
+
+      service.delete(mockData.id)
+        .subscribe((data) => {
+          expect(data).toEqual(true);
+          doneFn();
+        });
+
+      const url = `${service.apiUrl}/products/${mockData.id}`;
+      const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
+      req.flush(true); // Returns the mock products.
+      expect(req.request.method).toEqual('DELETE'); // Verifies that the request is a DELETE.
     });
   });
 });
