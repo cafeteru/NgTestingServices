@@ -1,6 +1,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { HttpStatusCode } from '@angular/common/http';
 import { generateManyProducts, generateOneProduct } from '../models/product.mock';
 import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product.model';
 import { ProductsService } from './products.service';
@@ -211,6 +212,45 @@ describe('ProductsService', () => {
       const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
       req.flush(true); // Returns the mock products.
       expect(req.request.method).toEqual('DELETE'); // Verifies that the request is a DELETE.
+    });
+  });
+
+  describe('tests for getOne', () => {
+    it('should return a product', (doneFn) => {
+      const mockData: Product = generateOneProduct();
+
+      service.getOne(mockData.id)
+        .subscribe((data) => {
+          expect(data).toEqual(mockData);
+          doneFn();
+        });
+
+      const url = `${service.apiUrl}/products/${mockData.id}`;
+      const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
+      req.flush(mockData); // Returns the mock products.
+      expect(req.request.method).toEqual('GET'); // Verifies that the request is a GET.
+    });
+
+    it('should return the right message when the status is 404', (doneFn) => {
+      const mockData: Product = generateOneProduct();
+      const msgError = 'El producto no existe';
+      const mockError = {
+        status: HttpStatusCode.NotFound,
+        statusText: msgError,
+      }
+
+      service.getOne(mockData.id)
+        .subscribe({
+          error: (err) => {
+            expect(err).toEqual(msgError);
+            doneFn();
+          }
+        });
+
+      const url = `${service.apiUrl}/products/${mockData.id}`;
+      const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
+      req.flush(msgError, mockError); // Returns the mock products.
+      expect(req.request.method).toEqual('GET'); // Verifies that the request is a GET.
     });
   });
 });
