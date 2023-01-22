@@ -86,3 +86,7 @@ module.exports = function (config) {
 ## Documentation
 
 [Matchers](https://jasmine.github.io/api/edge/matchers.html)
+
+## Libraries
+
+[Fakerjs](https://fakerjs.dev/)

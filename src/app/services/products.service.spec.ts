@@ -1,7 +1,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { environment } from '../environments/environment';
+import { generateManyProducts } from '../models/product.mock';
 import { Product } from '../models/product.model';
 import { ProductsService } from './products.service';
 
@@ -23,7 +23,7 @@ describe('ProductsService', () => {
   });
 
   describe('test for getAll', () => {
-    it('should return a product list', (doneFn) => {
+    it('should return a product list created manually', (doneFn) => {
       // Mocks the products.
       const mockProducts: Product[] = [
         {
@@ -59,6 +59,22 @@ describe('ProductsService', () => {
       const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
       req.flush(mockProducts); // Returns the mock products.
       httpTestingController.verify(); // Verifies that no requests are outstanding.
+    });
+
+    it('should return a product list', (doneFn) => {
+      const mockData: Product[] = generateManyProducts(20);
+
+      service.getAllSimple()
+        .subscribe((products) => {
+          expect(products.length).toEqual(mockData.length);
+          expect(products).toEqual(mockData);
+          doneFn();
+        });
+
+      const url = `${service.apiUrl}/products`;
+      const req = httpTestingController.expectOne(url);
+      req.flush(mockData);
+      httpTestingController.verify();
     });
   });
 });
