@@ -12,7 +12,7 @@ import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product.m
     providedIn: 'root',
 })
 export class ProductsService {
-    private apiUrl = `${environment.API_URL}/api/v1`;
+    apiUrl = `${environment.API_URL}/api/v1`;
 
     constructor(
         private http: HttpClient

@@ -17,7 +17,7 @@ export class ProductsComponent implements OnInit {
   }
 
   getAllProducts() {
-    this.productService.getAll().subscribe(products => {
+    this.productService.getAllSimple().subscribe(products => {
       this.products = products;
     });
   }
