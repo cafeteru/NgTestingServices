@@ -13,4 +13,4 @@ jobs:
       - name: Install
         run: npm install
       - name: run tests
-        run: npm run test --no-watch --code-coverage
+        run: npm run unit-test
