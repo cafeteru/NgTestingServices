@@ -10,10 +10,8 @@ export interface Product {
   taxes?: number;
 }
 
-
 export interface CreateProductDTO extends Omit<Product, 'id' | 'category'> {
   categoryId: number;
 }
 
-export interface UpdateProductDTO extends Partial<CreateProductDTO> { }
-
+export interface UpdateProductDTO extends Partial<CreateProductDTO> {}

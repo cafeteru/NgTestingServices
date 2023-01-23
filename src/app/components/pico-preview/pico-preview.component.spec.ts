@@ -8,9 +8,8 @@ describe('PicoPreviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PicoPreviewComponent ]
-    })
-    .compileComponents();
+      declarations: [PicoPreviewComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(PicoPreviewComponent);
     component = fixture.componentInstance;

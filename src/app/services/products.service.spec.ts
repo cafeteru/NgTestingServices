@@ -1,22 +1,41 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { HttpStatusCode } from '@angular/common/http';
-import { generateManyProducts, generateOneProduct } from '../models/product.mock';
-import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product.model';
+import { HTTP_INTERCEPTORS, HttpStatusCode } from '@angular/common/http';
+import {
+  generateManyProducts,
+  generateOneProduct,
+} from '../models/product.mock';
+import {
+  CreateProductDTO,
+  Product,
+  UpdateProductDTO,
+} from '../models/product.model';
 import { ProductsService } from './products.service';
+import { TokenInterceptor } from '../interceptors/token.interceptor';
+import { TokenService } from './token.service';
 
 describe('ProductsService', () => {
   let service: ProductsService;
   let httpTestingController: HttpTestingController;
+  let tokenService: TokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ProductsService],
-      imports: [HttpClientTestingModule]
+      providers: [
+        ProductsService,
+        TokenService,
+        { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
+      ],
+      imports: [HttpClientTestingModule],
     });
     service = TestBed.inject(ProductsService);
     httpTestingController = TestBed.inject(HttpTestingController);
+    tokenService = TestBed.inject(TokenService);
+    spyOn(tokenService, 'getToken').and.returnValue('token');
   });
 
   afterEach(() => {
@@ -49,11 +68,11 @@ describe('ProductsService', () => {
           price: 200,
           images: ['image1.jpg', 'image2.jpg'],
           description: 'Description 2',
-        }
+        },
       ];
 
       // Calls the service.
-      service.getAllSimple().subscribe(products => {
+      service.getAllSimple().subscribe((products) => {
         expect(products.length).toBe(mockProducts.length);
         expect(products).toEqual(mockProducts);
         doneFn();
@@ -62,18 +81,19 @@ describe('ProductsService', () => {
       // Mocks the request.
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
+      const headers = req.request.headers;
+      expect(headers.get('Authorization')).toEqual('Bearer token');
       req.flush(mockProducts); // Returns the mock products.
     });
 
     it('should return a product list', (doneFn) => {
       const mockData: Product[] = generateManyProducts(20);
 
-      service.getAllSimple()
-        .subscribe((products) => {
-          expect(products.length).toEqual(mockData.length);
-          expect(products).toEqual(mockData);
-          doneFn();
-        });
+      service.getAllSimple().subscribe((products) => {
+        expect(products.length).toEqual(mockData.length);
+        expect(products).toEqual(mockData);
+        doneFn();
+      });
 
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url);
@@ -85,11 +105,10 @@ describe('ProductsService', () => {
     it('should return a product list', (doneFn) => {
       const mockData: Product[] = generateManyProducts(20);
 
-      service.getAll()
-        .subscribe((products) => {
-          expect(products.length).toEqual(mockData.length);
-          doneFn();
-        });
+      service.getAll().subscribe((products) => {
+        expect(products.length).toEqual(mockData.length);
+        doneFn();
+      });
 
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url);
@@ -99,15 +118,14 @@ describe('ProductsService', () => {
     it('should return a product list with taxes', (doneFn) => {
       const mockData: Product[] = generateManyProducts(20);
 
-      service.getAll()
-        .subscribe((products) => {
-          expect(products.length).toEqual(mockData.length);
-          expect(products).not.toEqual(mockData);
-          products.forEach((product) => {
-            expect(product.taxes).toEqual(0.21 * product.price);
-          });
-          doneFn();
+      service.getAll().subscribe((products) => {
+        expect(products.length).toEqual(mockData.length);
+        expect(products).not.toEqual(mockData);
+        products.forEach((product) => {
+          expect(product.taxes).toEqual(0.21 * product.price);
         });
+        doneFn();
+      });
 
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url);
@@ -119,15 +137,14 @@ describe('ProductsService', () => {
         {
           ...generateOneProduct(),
           price: -100,
-        }
+        },
       ];
 
-      service.getAll()
-        .subscribe((products) => {
-          expect(products.length).toEqual(mockData.length);
-          expect(products[0].taxes).toEqual(0);
-          doneFn();
-        });
+      service.getAll().subscribe((products) => {
+        expect(products.length).toEqual(mockData.length);
+        expect(products[0].taxes).toEqual(0);
+        doneFn();
+      });
 
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url);
@@ -139,11 +156,10 @@ describe('ProductsService', () => {
       const limit = 10;
       const offset = 3;
 
-      service.getAll(limit, offset)
-        .subscribe((data) => {
-          expect(data.length).toEqual(mockData.length);
-          doneFn();
-        });
+      service.getAll(limit, offset).subscribe((data) => {
+        expect(data.length).toEqual(mockData.length);
+        doneFn();
+      });
 
       const url = `${service.apiUrl}/products?limit=${limit}&offset=${offset}`;
       const req = httpTestingController.expectOne(url);
@@ -162,11 +178,10 @@ describe('ProductsService', () => {
         categoryId: 1,
       };
 
-      service.create({ ...dto })
-        .subscribe((data) => {
-          expect(data).toEqual(mockData);
-          doneFn();
-        });
+      service.create({ ...dto }).subscribe((data) => {
+        expect(data).toEqual(mockData);
+        doneFn();
+      });
 
       const url = `${service.apiUrl}/products`;
       const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
@@ -184,11 +199,10 @@ describe('ProductsService', () => {
         categoryId: 1,
       };
 
-      service.update(mockData.id, { ...dto })
-        .subscribe((data) => {
-          expect(data).toEqual(mockData);
-          doneFn();
-        });
+      service.update(mockData.id, { ...dto }).subscribe((data) => {
+        expect(data).toEqual(mockData);
+        doneFn();
+      });
 
       const url = `${service.apiUrl}/products/${mockData.id}`;
       const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
@@ -202,11 +216,10 @@ describe('ProductsService', () => {
     it('should delete a product', (doneFn) => {
       const mockData: Product = generateOneProduct();
 
-      service.delete(mockData.id)
-        .subscribe((data) => {
-          expect(data).toEqual(true);
-          doneFn();
-        });
+      service.delete(mockData.id).subscribe((data) => {
+        expect(data).toEqual(true);
+        doneFn();
+      });
 
       const url = `${service.apiUrl}/products/${mockData.id}`;
       const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
@@ -219,11 +232,10 @@ describe('ProductsService', () => {
     it('should return a product', (doneFn) => {
       const mockData: Product = generateOneProduct();
 
-      service.getOne(mockData.id)
-        .subscribe((data) => {
-          expect(data).toEqual(mockData);
-          doneFn();
-        });
+      service.getOne(mockData.id).subscribe((data) => {
+        expect(data).toEqual(mockData);
+        doneFn();
+      });
 
       const url = `${service.apiUrl}/products/${mockData.id}`;
       const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
@@ -237,15 +249,14 @@ describe('ProductsService', () => {
       const mockError = {
         status: HttpStatusCode.NotFound,
         statusText: msgError,
-      }
+      };
 
-      service.getOne(mockData.id)
-        .subscribe({
-          error: (err) => {
-            expect(err).toEqual(msgError);
-            doneFn();
-          }
-        });
+      service.getOne(mockData.id).subscribe({
+        error: (err) => {
+          expect(err).toEqual(msgError);
+          doneFn();
+        },
+      });
 
       const url = `${service.apiUrl}/products/${mockData.id}`;
       const req = httpTestingController.expectOne(url); // Verifies that the request is made to the correct URL.
